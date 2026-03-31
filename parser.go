@@ -92,7 +92,7 @@ func (p *Parser) parseFields(structType *dwarf.StructType, offset int64, depth i
 	return fields, nil
 }
 
-func (p *Parser) ParseStructInfo(offset dwarf.Offset) (*StructInfo, error) {
+func (p *Parser) parseStructInfo(offset dwarf.Offset) (*StructInfo, error) {
 	// find the type by offset
 	offsetType, err := p.dwData.Type(offset)
 	if err != nil {
@@ -128,7 +128,7 @@ func (p *Parser) reset() {
 	p.seen = make(map[string]struct{})
 }
 
-func (p *Parser) IterateStructInfoWithCallbackFromCache(processStructInfo ProcessStructInfoCallback) error {
+func (p *Parser) iterateStructInfoWithCallbackFromCache(processStructInfo ProcessStructInfoCallback) error {
 	f, err := os.Open(p.path)
 	if err != nil {
 		return fmt.Errorf("failed to open cache file %s", p.path)
@@ -158,7 +158,7 @@ func (p *Parser) IterateStructInfoWithCallbackFromCache(processStructInfo Proces
 	return nil
 }
 
-func (p *Parser) IterateStructInfoWithCallbackFromDwarf(processStructInfo ProcessStructInfoCallback) error {
+func (p *Parser) iterateStructInfoWithCallbackFromDwarf(processStructInfo ProcessStructInfoCallback) error {
 	p.reset()
 	reader := p.dwData.Reader()
 	for {
@@ -196,7 +196,7 @@ func (p *Parser) IterateStructInfoWithCallbackFromDwarf(processStructInfo Proces
 			}
 			// parse new struct
 			p.seen[key] = struct{}{}
-			structInfo, err := p.ParseStructInfo(entry.Offset)
+			structInfo, err := p.parseStructInfo(entry.Offset)
 			if err != nil {
 				return err
 			}
@@ -211,9 +211,9 @@ func (p *Parser) IterateStructInfoWithCallbackFromDwarf(processStructInfo Proces
 
 func (p *Parser) IterateStructInfoWithCallback(processStructInfo ProcessStructInfoCallback) error {
 	if p.fromCache {
-		return p.IterateStructInfoWithCallbackFromCache(processStructInfo)
+		return p.iterateStructInfoWithCallbackFromCache(processStructInfo)
 	}
-	return p.IterateStructInfoWithCallbackFromDwarf(processStructInfo)
+	return p.iterateStructInfoWithCallbackFromDwarf(processStructInfo)
 }
 
 func (p *Parser) cacheStructsInternal(cachePath string) (ProcessStructInfoCallback, func(), error) {
