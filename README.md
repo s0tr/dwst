@@ -1,0 +1,1 @@
+DWST is an utility for visualizing data structures in binaries containing dwarf info
