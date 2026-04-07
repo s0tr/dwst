@@ -12,7 +12,7 @@ type BaseInfo struct {
 }
 
 type Field interface {
-	Text(expand bool) string
+	Text(expand bool, hex bool) string
 }
 
 type FieldInfo struct {
@@ -30,29 +30,41 @@ type StructInfo struct {
 
 const padding = "    "
 
-func (f *FieldInfo) Text(expand bool) string {
-	return fmt.Sprintf("%s %-8s %s:%s\n",
-		strings.Repeat(padding, f.Depth+2),
-		fmt.Sprintf("%d[%d]", f.Offset, f.Size),
-		f.Name,
-		f.Type)
+func (f *FieldInfo) Text(expand bool, hex bool) string {
+	if hex {
+		return fmt.Sprintf("%s %-8s %s:%s\n",
+			strings.Repeat(padding, f.Depth+2),
+			fmt.Sprintf("0x%x[0x%x]", f.Offset, f.Size),
+			f.Name,
+			f.Type)
+	} else {
+		return fmt.Sprintf("%s %-8s %s:%s\n",
+			strings.Repeat(padding, f.Depth+2),
+			fmt.Sprintf("%d[%d]", f.Offset, f.Size),
+			f.Name,
+			f.Type)
+	}
 }
 
-func (s *StructInfo) Text(expand bool) string {
+func (s *StructInfo) Text(expand bool, hex bool) string {
 	var sb strings.Builder
 	if s.IsRoot {
 		fmt.Fprintf(&sb, "%s %s\n", s.Kind, s.Name)
-		fmt.Fprintf(&sb, "%ssize: %d\n", padding, s.Size)
+		if hex {
+			fmt.Fprintf(&sb, "%ssize: 0x%x\n", padding, s.Size)
+		} else {
+			fmt.Fprintf(&sb, "%ssize: %d\n", padding, s.Size)
+		}
 		fmt.Fprintf(&sb, "%smembers:\n", padding)
 
 	} else {
-		sb.WriteString(s.FieldInfo.Text(expand))
+		sb.WriteString(s.FieldInfo.Text(expand, hex))
 	}
 
 	if s.IsRoot || expand {
 		// TODO: implement <padding> print for holes in data structures
 		for _, field := range s.Fields {
-			sb.WriteString(field.Text(expand))
+			sb.WriteString(field.Text(expand, hex))
 		}
 	}
 	return sb.String()

@@ -26,6 +26,7 @@ func parseOptions() {
 	flag.StringVar(&opts.CachePath, "cache-path", "", "saves all structures to gob.gz file")
 	flag.BoolVar(&opts.Printer.Expand, "expand", false, "expand nested structs")
 	flag.BoolVar(&opts.Printer.PrintAsJson, "json", false, "print as json")
+	flag.BoolVar(&opts.Printer.Hex, "hex", false, "print numbers as hex")
 	flag.StringVar(&opts.Filter.StructName, "name", "", "filter by structure name")
 	flag.Int64Var(&opts.Filter.SizeLow, "size-low", -1, "filter by minimum structure size")
 	flag.Lookup("size-low").DefValue = "0"

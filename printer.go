@@ -8,6 +8,7 @@ import (
 
 type Printer struct {
 	Expand      bool
+	Hex         bool
 	PrintAsJson bool
 }
 
@@ -19,7 +20,7 @@ func (p *Printer) printAsJson(structInfo *StructInfo) {
 }
 
 func (p *Printer) printAsText(structInfo *StructInfo) {
-	fmt.Println(structInfo.Text(p.Expand))
+	fmt.Println(structInfo.Text(p.Expand, p.Hex))
 }
 
 func (p *Printer) Print(structInfo *StructInfo) {
